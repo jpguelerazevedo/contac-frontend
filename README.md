@@ -6,11 +6,11 @@ Site de uma página para um escritório de contabilidade. O foco do projeto é o
 
 **Desktop**
 
-[▶ Assistir ao vídeo do site no desktop](docs/site-desktop-2.mp4)
+https://github.com/user-attachments/assets/b0f885f8-8e0f-40ea-9d0c-f21c8e9c521f
 
 **Celular**
 
-[▶ Assistir ao vídeo do site no celular](docs/site-celular-2.mp4)
+https://github.com/user-attachments/assets/2b4b9223-0870-4fb9-b465-87dca56969c1
 
 ## Design
 
