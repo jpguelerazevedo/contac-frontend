@@ -169,27 +169,6 @@ function updateLayers() {
   })
 }
 
-/* ---------- Band ---------- */
-
-const band = $('.band')
-const BAND_SPEED = 0.3 // px the rows slide per px scrolled
-const bandRows = $$('.band__row').map((el) => ({ el, dir: Number(el.dataset.dir), travel: 0 }))
-let bandTop = 0
-
-function measureBand() {
-  bandTop = band.getBoundingClientRect().top + scrollY
-  const distance = (vh + band.offsetHeight) * BAND_SPEED
-  bandRows.forEach((r) => (r.travel = Math.min(distance, Math.max(0, r.el.scrollWidth - vw))))
-}
-
-function updateBand() {
-  const p = range(scrollY, bandTop - vh, bandTop + band.offsetHeight)
-  bandRows.forEach((r) => {
-    const x = r.dir < 0 ? -p * r.travel : -(1 - p) * r.travel
-    r.el.style.transform = `translate3d(${x}px, 0, 0)`
-  })
-}
-
 /* ---------- Process: pinned horizontal scroll ---------- */
 
 const process = $('.process')
@@ -385,7 +364,6 @@ function measure() {
   measureIntro()
   placeCc()
   measureLayers()
-  measureBand()
 }
 
 function frame(now) {
@@ -396,7 +374,6 @@ function frame(now) {
   updateIntro(now)
   updateWords()
   updateLayers()
-  updateBand()
   updateProcess()
   updateDraw()
   requestAnimationFrame(frame)

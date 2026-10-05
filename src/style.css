@@ -551,7 +551,14 @@ address {
   transform: none;
 }
 
-/* Band: two rows sliding against each other with the scroll */
+/* Band: two rows drifting against each other on their own, slowly.
+   Each row holds its words twice, so sliding it by one copy loops without a seam. */
+
+@keyframes band {
+  to {
+    transform: translate3d(calc(-50% - var(--gap) / 2), 0, 0);
+  }
+}
 
 .band {
   overflow: hidden;
@@ -560,10 +567,12 @@ address {
 }
 
 .band__row {
+  --gap: 0.45em;
   display: flex;
   align-items: center;
-  gap: 0.45em;
+  gap: var(--gap);
   width: max-content;
+  animation: band 70s linear infinite;
   font-stretch: 125%;
   font-weight: 500;
   font-size: clamp(3rem, 10vw, 10rem);
@@ -575,8 +584,8 @@ address {
 
 .band__row svg {
   flex: none;
-  width: 0.62em;
-  height: 0.62em;
+  width: 0.5em;
+  height: 0.5em;
   color: var(--accent);
 }
 
@@ -587,6 +596,7 @@ address {
 
 .band__row--outline {
   color: var(--dim);
+  animation-direction: reverse;
 }
 
 .band__row--outline span {
@@ -869,7 +879,8 @@ address {
     height: auto;
   }
 
-  .intro__hint {
+  .intro__hint,
+  .band__row {
     animation: none;
   }
 
