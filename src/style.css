@@ -339,20 +339,51 @@ address {
   letter-spacing: 0.02em;
 }
 
+/* A band of light falls through the words and on down the line, in one continuous pass.
+   --wave is the band's distance from the top of the hint; each piece subtracts its own offset. */
+
+@property --wave {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: -32px; /* must be px: a registered property's initial value can't use rem */
+}
+
+.intro__hint {
+  --band: 1.25rem;
+  --words-h: 1.3125rem; /* one line of 0.875rem text at 1.5 line-height */
+  animation: hint 2.6s linear infinite;
+}
+
+.intro__hint span,
+.intro__hint i {
+  background-image: linear-gradient(to bottom, transparent, var(--accent), transparent);
+  background-repeat: no-repeat;
+  background-size: 100% var(--band);
+}
+
+.intro__hint span {
+  /* lighter than the line's #2a2a2a on purpose: thin letters read darker than a solid stroke */
+  background-color: var(--dim);
+  background-position: 0 var(--wave);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .intro__hint i {
   display: block;
   width: 1px;
   height: 3rem;
-  background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / 100% 40%, var(--rule-dark);
-  animation: hint 2.2s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+  background-color: var(--rule-dark);
+  background-position: 0 calc(var(--wave) - var(--words-h) - 0.9rem);
 }
 
 @keyframes hint {
   from {
-    background-position: 0 -2rem;
+    --wave: -2rem;
   }
   to {
-    background-position: 0 4rem;
+    --wave: 6.25rem;
   }
 }
 
@@ -838,7 +869,7 @@ address {
     height: auto;
   }
 
-  .intro__hint i {
+  .intro__hint {
     animation: none;
   }
 
