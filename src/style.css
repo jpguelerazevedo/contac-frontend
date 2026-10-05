@@ -1,0 +1,858 @@
+:root {
+  --ink: #000;
+  --paper: #fff;
+  --mute: #8c8c8c;
+  --dim: #5a5a5a;
+  --rule-dark: #2a2a2a;
+  --rule-light: #d6d6d6;
+  /* brand orange, used only on small marks: full stops, thin lines, selection */
+  --accent: #ff6a00;
+  --accent-dim: #9c4100;
+
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --nav-h: 4.5rem;
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ink);
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+address {
+  font-style: normal;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.wrap {
+  width: 100%;
+  padding-inline: var(--gutter);
+}
+
+/* Type */
+
+.display,
+.intro__title,
+.contact__title {
+  font-stretch: 125%;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.display {
+  font-size: clamp(2.5rem, 7vw, 7rem);
+}
+
+.note {
+  max-width: 34ch;
+  color: var(--mute);
+  font-size: 1.0625rem;
+}
+
+/* Masked line reveal: .line clips, its child slides up */
+
+.line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.line > span {
+  display: block;
+  will-change: transform;
+}
+
+.js [data-reveal] .line > span {
+  transform: translateY(112%);
+  transition: transform 1.1s var(--ease);
+}
+
+.js [data-reveal] .line:nth-child(2) > span {
+  transition-delay: 0.09s;
+}
+
+.js [data-reveal] .fade {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 0.9s ease 0.25s,
+    transform 0.9s var(--ease) 0.25s;
+}
+
+.js [data-reveal].is-in .line > span,
+.js [data-reveal].is-in .fade {
+  opacity: 1;
+  transform: none;
+}
+
+/* Flying logo: the video travels from the centre of the screen to the nav */
+
+.flyer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+  opacity: 0;
+  /* the video's black background drops out, so it never covers the page */
+  mix-blend-mode: screen;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition: opacity 0.25s linear;
+}
+
+.flyer.is-ready {
+  opacity: 1;
+}
+
+.flyer.is-docked {
+  opacity: 0;
+}
+
+/* Nav: white on difference, so it turns black over the white sections */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--nav-h);
+  padding-inline: var(--gutter);
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.nav a {
+  pointer-events: auto;
+}
+
+.nav__name,
+.nav__cc {
+  font-stretch: 125%;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.nav__name {
+  justify-self: start;
+}
+
+/* The nav is on difference, which would turn orange into blue over the white sections,
+   so with JS the ".cc" is left blank here and .nav__cc paints it on top, unblended. */
+.js .nav__cc-slot {
+  color: transparent;
+}
+
+.nav__cc {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 31;
+  color: var(--accent);
+  pointer-events: none;
+}
+
+.js .nav__cc {
+  display: block;
+}
+
+.nav__mark {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  perspective: 400px;
+}
+
+.nav__mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.25s linear;
+}
+
+.nav__mark.is-docked svg {
+  opacity: 1;
+}
+
+.nav__links {
+  justify-self: end;
+  display: flex;
+  gap: clamp(1rem, 2.4vw, 2.25rem);
+  font-size: 0.9375rem;
+}
+
+.nav__links a {
+  position: relative;
+  padding-block: 0.4rem;
+}
+
+.nav__links a::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease);
+}
+
+.nav__links a:hover::after,
+.nav__links a:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* With JS the underline is drawn by .nav-lines instead: the nav is on difference,
+   which would turn orange into blue over the white sections. */
+.js .nav__links a::after {
+  display: none;
+}
+
+.nav-lines {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 31;
+  pointer-events: none;
+}
+
+.nav-lines i {
+  position: absolute;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease);
+}
+
+.nav-lines i.is-on {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Intro */
+
+.intro {
+  position: relative;
+  height: 280vh;
+  background: var(--ink);
+}
+
+.intro__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.intro__copy {
+  position: absolute;
+  inset: auto var(--gutter) clamp(2.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 2rem;
+}
+
+.intro__title {
+  font-size: clamp(2.25rem, 6.6vw, 7.25rem);
+}
+
+.intro__lede {
+  max-width: 24ch;
+  padding-bottom: 0.6em;
+  color: var(--mute);
+}
+
+.intro__hint {
+  position: absolute;
+  inset: auto 0 clamp(1.5rem, 5vh, 3rem) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  color: var(--mute);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+.intro__hint i {
+  display: block;
+  width: 1px;
+  height: 3rem;
+  background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / 100% 40%, var(--rule-dark);
+  animation: hint 2.2s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+}
+
+@keyframes hint {
+  from {
+    background-position: 0 -2rem;
+  }
+  to {
+    background-position: 0 4rem;
+  }
+}
+
+/* About: words go from grey to black as you read down */
+
+.about {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  padding-block: clamp(7rem, 24vh, 16rem);
+}
+
+.about__arcs {
+  position: absolute;
+  top: 10%;
+  right: -22vw;
+  width: min(95vw, 70rem);
+  color: var(--ink);
+  opacity: 0.05;
+  will-change: transform;
+}
+
+.about__text {
+  position: relative;
+  max-width: 22em;
+  font-size: clamp(1.75rem, 4.3vw, 4.25rem);
+  font-weight: 450;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.about__text .w {
+  opacity: 0.14;
+}
+
+/* Services: a ledger */
+
+.services {
+  background: var(--ink);
+  padding-block: clamp(6rem, 18vh, 12rem) clamp(4rem, 12vh, 8rem);
+}
+
+.services__head,
+.process__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem 3rem;
+}
+
+.services__head {
+  margin-bottom: clamp(3rem, 9vh, 6rem);
+}
+
+.ledger__row {
+  position: relative;
+}
+
+.ledger__row::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--rule-dark);
+  transform-origin: left;
+}
+
+.ledger__row:last-child::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--rule-dark);
+}
+
+.ledger__row a {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.5rem 3rem;
+  padding: clamp(1.4rem, 3.4vh, 2.4rem) 0;
+  transition:
+    color 0.35s ease,
+    padding 0.6s var(--ease);
+}
+
+.ledger__row a::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(var(--gutter) * -1);
+  background: var(--paper);
+  transform: scaleY(0);
+  /* --o is set by JS to the edge the pointer crossed, so the fill follows the mouse */
+  transform-origin: var(--o, bottom);
+  transition: transform 0.55s var(--ease);
+}
+
+.ledger__name,
+.ledger__desc {
+  position: relative;
+}
+
+.ledger__name {
+  font-stretch: 125%;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3.2vw, 3rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.ledger__desc {
+  max-width: 44ch;
+  color: var(--mute);
+  transition: color 0.35s ease;
+}
+
+@media (hover: hover) {
+  .ledger__row a:hover,
+  .ledger__row a:focus-visible {
+    color: var(--ink);
+    padding-left: 1.25rem;
+  }
+
+  .ledger__row a:hover::before,
+  .ledger__row a:focus-visible::before {
+    transform: scaleY(1);
+    transform-origin: var(--o, top);
+  }
+
+  .ledger__row a:hover .ledger__desc,
+  .ledger__row a:focus-visible .ledger__desc {
+    color: var(--dim);
+  }
+}
+
+.js .ledger__row[data-reveal]::before {
+  transform: scaleX(0);
+  transition: transform 1.2s var(--ease);
+}
+
+.js .ledger__row[data-reveal] .ledger__name,
+.js .ledger__row[data-reveal] .ledger__desc {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.8s ease 0.15s,
+    transform 0.9s var(--ease) 0.15s,
+    color 0.35s ease;
+}
+
+.js .ledger__row[data-reveal] .ledger__desc {
+  transition-delay: 0.25s, 0.25s, 0s;
+}
+
+.js .ledger__row[data-reveal].is-in::before {
+  transform: none;
+}
+
+.js .ledger__row[data-reveal].is-in .ledger__name,
+.js .ledger__row[data-reveal].is-in .ledger__desc {
+  opacity: 1;
+  transform: none;
+}
+
+/* Band: two rows sliding against each other with the scroll */
+
+.band {
+  overflow: hidden;
+  background: var(--ink);
+  padding-block: clamp(2rem, 8vh, 6rem) clamp(5rem, 16vh, 11rem);
+}
+
+.band__row {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  width: max-content;
+  font-stretch: 125%;
+  font-weight: 500;
+  font-size: clamp(3rem, 10vw, 10rem);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.band__row svg {
+  flex: none;
+  width: 0.62em;
+  height: 0.62em;
+  color: var(--accent);
+}
+
+/* the outlined row sits back, so its marks take the darker orange */
+.band__row--outline svg {
+  color: var(--accent-dim);
+}
+
+.band__row--outline {
+  color: var(--dim);
+}
+
+.band__row--outline span {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--dim);
+}
+
+/* Process: pinned, scrolls sideways */
+
+.process {
+  position: relative;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.process__stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block: calc(var(--nav-h) + clamp(1rem, 5vh, 3.5rem)) clamp(1.5rem, 5vh, 3rem);
+}
+
+.process .note {
+  color: var(--dim);
+}
+
+.process__track {
+  display: flex;
+  gap: clamp(2rem, 6vw, 7rem);
+  width: max-content;
+  padding-inline: var(--gutter);
+  will-change: transform;
+}
+
+.step {
+  position: relative;
+  flex: none;
+  width: min(78vw, 30rem);
+  padding-top: clamp(5rem, 17vh, 11rem);
+}
+
+.step__num {
+  position: absolute;
+  top: 0;
+  left: -0.04em;
+  font-stretch: 125%;
+  font-weight: 500;
+  font-size: clamp(9rem, 32vh, 20rem);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px #b8b8b8;
+  font-variant-numeric: tabular-nums;
+  will-change: transform;
+}
+
+.step h3 {
+  position: relative;
+  font-stretch: 125%;
+  font-weight: 500;
+  font-size: clamp(1.75rem, 3.4vw, 3rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.step p {
+  position: relative;
+  max-width: 36ch;
+  margin-top: 1rem;
+  color: var(--dim);
+}
+
+.process__bar i {
+  display: block;
+  height: 2px;
+  background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / calc(var(--p, 0) * 100%) 100%,
+    var(--rule-light);
+}
+
+/* Pinned only when there is room and motion is welcome */
+.process.is-pinned .process__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.process:not(.is-pinned) .process__stage {
+  padding-block: clamp(5rem, 14vh, 9rem);
+}
+
+.process:not(.is-pinned) .process__track {
+  flex-direction: column;
+  width: auto;
+  gap: 4rem;
+  margin-block: 3rem 1rem;
+}
+
+.process:not(.is-pinned) .process__bar {
+  display: none;
+}
+
+/* Contact */
+
+.contact {
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  padding-block: clamp(7rem, 22vh, 14rem) clamp(4rem, 12vh, 8rem);
+}
+
+.contact__mark {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--gutter) * -1);
+  width: min(70vw, 46rem);
+  translate: 0 -50%;
+  color: var(--rule-dark);
+}
+
+.contact__mark path,
+.contact__mark use {
+  stroke-dasharray: 1;
+  stroke-dashoffset: var(--draw, 0);
+}
+
+.contact .wrap {
+  position: relative;
+}
+
+.contact__title {
+  font-size: clamp(3.25rem, 13vw, 14rem);
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 2.5rem 3rem;
+  margin-top: clamp(3.5rem, 10vh, 7rem);
+}
+
+.contact__links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.contact__links span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--mute);
+  font-size: 0.875rem;
+}
+
+.contact__links a {
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1px;
+  transition: background-size 0.45s var(--ease);
+}
+
+.contact__links a:hover {
+  background-size: 0 1px;
+  background-position: 100% 100%;
+}
+
+/* Footer */
+
+.foot {
+  background: var(--ink);
+  color: var(--mute);
+  font-size: 0.875rem;
+}
+
+.foot .wrap {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--rule-dark);
+}
+
+.foot a:hover {
+  color: var(--paper);
+}
+
+/* Cursor: a white dot on difference, so it is black over white and inverts any text under it.
+   The blend sits on the layer, not on each piece, so the dot and its tail merge
+   into one shape instead of inverting one another where they overlap. */
+
+.cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cursor.is-on {
+  opacity: 1;
+}
+
+.cursor svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: #fff;
+  stroke-linecap: round;
+}
+
+.cursor i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1rem;
+  height: 1rem;
+  margin: -0.5rem 0 0 -0.5rem;
+  border-radius: 50%;
+  background: #fff;
+  will-change: transform;
+}
+
+.has-cursor,
+.has-cursor * {
+  cursor: none !important;
+}
+
+/* Small screens */
+
+@media (max-width: 760px) {
+  .nav__links a:not(:last-child) {
+    display: none;
+  }
+
+  .intro__copy {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  /* sized so the longest line fits without wrapping inside its mask */
+  .intro__title {
+    font-size: 8.2vw;
+  }
+
+  .intro__lede {
+    padding-bottom: 0;
+  }
+
+  .ledger__row a {
+    grid-template-columns: 1fr;
+  }
+
+  .about__arcs {
+    right: -45vw;
+    width: 130vw;
+  }
+
+  .contact__mark {
+    top: 38%;
+    right: -30vw;
+    width: 110vw;
+  }
+
+  .contact__grid,
+  .contact__links {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Reduced motion: no pinning, no travel, logo sits in the nav from the start */
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    height: auto;
+  }
+
+  .intro__hint i {
+    animation: none;
+  }
+
+  .js [data-reveal] .line > span,
+  .js [data-reveal] .fade,
+  .js .ledger__row[data-reveal]::before,
+  .js .ledger__row[data-reveal] .ledger__name,
+  .js .ledger__row[data-reveal] .ledger__desc {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .about__text .w {
+    opacity: 1 !important;
+  }
+}
